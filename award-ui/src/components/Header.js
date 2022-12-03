@@ -29,6 +29,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import axios from 'axios';
+import { Chip } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -161,6 +162,38 @@ export default function Header(props) {
         }
     }
 
+    const clearFilter = async () => {
+        try {
+            await axios.get(`http://localhost:8000/api/award`)
+                .then((response) => {
+                    console.log("success", response.data, response.data.data);
+                    let tempAwards = [];
+                    response.data.data.map((award) => {
+                        tempAwards.push(award);
+                    });
+                    props.onFilterData(tempAwards);
+                    props.onFilterCount(response.data.data.last_page);
+                });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const filterTypeString = ()=>{
+
+        if (filterType["all"]) {
+            return "ALL";
+        }
+
+        let filterBy = [];
+
+        if (filterType["vouchers"]) filterBy.push("vouchers");
+        if (filterType["products"]) filterBy.push("products");
+        if (filterType["others"]) filterBy.push("others");
+
+        return filterBy.join(",");
+    }
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -233,7 +266,6 @@ export default function Header(props) {
             <Drawer
                 sx={{
                     width: drawerWidth,
-                    flexShrink: 0,
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
@@ -244,6 +276,10 @@ export default function Header(props) {
                 onClose={toggleDrawerFilter(false)}
             >
                 <Typography variant="h6" align={"center"}>Filter</Typography>
+
+                <Chip label={`0 - ${filterPoin.toLocaleString("en-US")} Poin`} variant="outlined" color="primary" /> 
+                <Chip label={filterTypeString()} variant="outlined" color="primary" /> 
+                <Chip label="Clear Filter" onClick={clearFilter} />
                 
                 <Stack sx={{
                     padding: "8px 16px",
