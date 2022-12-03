@@ -21,7 +21,6 @@ class AwardApiController extends Controller
         if (!empty($type)) {
             $types = explode(",", strtolower($type));
             $list = $list->whereRaw("LOWER(award_type) in ('". implode("','", $types) ."')");
-            return response()->json($list->get());
         }
 
         if (!empty($minPoin) && !empty($maxPoin)) {
