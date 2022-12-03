@@ -19,3 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/award', 'Api\AwardApiController@list');
+Route::get('/email', 'Api\AwardApiController@isEmailExists');

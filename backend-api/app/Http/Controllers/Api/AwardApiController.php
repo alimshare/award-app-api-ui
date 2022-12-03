@@ -4,27 +4,49 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Award;
+use App\Models\Award;
+use App\Models\User;
 
 class AwardApiController extends Controller
 {
     public function list(Request $req)
     {
         $list = new Award;
-        $type = $req->get('type');
-        $minPoin = $req->get('min_poin');
-        $maxPoin = $req->get('max_poin');
+        $type    = $req['type'];
+        $minPoin = $req['min'];
+        $maxPoin = $req['max'];
+
+        $limit  = $req['limit'] ?? 10;
 
         if (!empty($type)) {
-            $list->where('type', $type);
+            $types = explode(",", strtolower($type));
+            $list = $list->whereRaw("LOWER(award_type) in ('". implode("','", $types) ."')");
+            return response()->json($list->get());
         }
 
-        if (!empty($req->get('min_poin')) && !empty($req->get('max_poin'))) {
-            $list->whereBetween('poin', $min, $max );
+        if (!empty($minPoin) && !empty($maxPoin)) {
+            $list = $list->whereBetween('poin', [$minPoin, $maxPoin]);
         }
 
-        $list->paginate(10);
+        $list = $list->paginate($limit);
 
         return response()->json($list);
+    }
+
+    public function isEmailExists(Request $req)
+    {
+        $email = $req['email'];
+        if (empty($email)) {
+            return response()->json(
+                ['code'=>'400', 'message' => 'email is required'], 400
+            );
+        }
+
+        $isExists = User::where('email', $req['email'])->exists();
+        
+        return response()->json(['code'=>200, 'message'=>'success', 'data'=>[
+            "exists" => $isExists, 
+            "email"  => $email,
+        ]], 200);
     }
 }
