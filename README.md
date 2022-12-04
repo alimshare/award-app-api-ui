@@ -20,9 +20,11 @@ composer install
 php artisan migrate
 php artisan serve
 ```
-
+*note*
 _before `php artisan migrate` make sure you already setup the database config on `.env` file_
 
+*having problem on running database migration ?*
+no problem, use script `ddl.sql` and execute it manually on your MySQL database
 
 ### Award UI
 - React JS, Javascript Framework
